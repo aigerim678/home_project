@@ -82,12 +82,6 @@ def users_cart(request):
 
 
 
-
-
-
-
-
-
 @login_required
 
 def logout(request):
