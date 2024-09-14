@@ -1,8 +1,8 @@
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse
-from django.shortcuts import render, get_list_or_404
+from django.shortcuts import render, get_list_or_404, get_object_or_404
 
-from goods.models import Products
+from goods.models import Products, TagPost
 from goods.utils import q_search
 
 
@@ -48,3 +48,21 @@ def product(request, product_slug):
     }
 
     return render(request, 'goods/product.html', context)
+
+
+def show_tag_postlist(request, tag_slug):
+    page = request.GET.get('page', 1)
+    tag = get_object_or_404(TagPost, slug=tag_slug)
+    posts = get_list_or_404(Products.objects.filter(tags__slug=tag_slug))
+
+    paginator = Paginator(posts, 3)
+
+    current_page = paginator.page(page)
+    context = {
+        'title': f'Посты с тегом: {tag.tag}',
+        'goods': current_page,  # Передаем все посты без пагинации
+        'cat_selected': None,
+        'category_slug': tag_slug
+    }
+
+    return render(request, 'goods/catalog.html', context)

@@ -36,3 +36,8 @@ body {
   border-radius: 15px;
   font-size: 0.7rem;
 }
+
+.tags-list a {
+    color: inherit; /* Унаследовать цвет текста от родительского элемента */
+    text-decoration: none; /* Убрать нижнее подчеркивание */
+}

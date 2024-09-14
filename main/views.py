@@ -1,7 +1,10 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from goods.models import Categories
+from goods.models import TagPost
+
+
 def index(request):
 
 
@@ -22,3 +25,4 @@ def about(request):
     }
 
     return render(request, 'main/about.html', context)
+

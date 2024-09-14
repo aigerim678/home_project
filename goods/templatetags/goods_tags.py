@@ -3,6 +3,8 @@ from django.utils.http import urlencode
 from goods.models import Categories
 from django import template
 
+from goods.models import TagPost
+
 register = template.Library()
 
 
@@ -15,3 +17,7 @@ def change_params(context, **kwargs):
     query = context["request"].GET.dict()
     query.update(kwargs)
     return urlencode(query)
+
+@register.inclusion_tag('goods/list_tags.html')
+def show_all_tags():
+    return {'tags': TagPost.objects.all()}

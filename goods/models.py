@@ -23,6 +23,7 @@ class Products(models.Model):
     discount = models.DecimalField(default=0.00, max_digits=7, decimal_places=2, verbose_name="Скидка")
     quantity = models.PositiveIntegerField(default=0, verbose_name="Количсетво")
     category = models.ForeignKey(to=Categories, on_delete=models.CASCADE, verbose_name="Категория")
+    tags = models.ManyToManyField('TagPost', blank=True, related_name='tags')
 
     class Meta:
         db_table: str = "product"
@@ -43,3 +44,13 @@ class Products(models.Model):
         if self.discount:
             return round(self.price - self.price*self.discount/100, 2)
         return self.price
+
+class TagPost(models.Model):
+    tag = models.CharField(max_length=100, db_index=True)
+    slug = models.SlugField(max_length=355, unique=True, db_index=True)
+
+    def __str__(self):
+        return self.tag
+
+    def get_absolute_url(self):
+        return reverse('goods:tag', kwargs={'tag_slug': self.slug})
