@@ -10,6 +10,7 @@ class Categories(models.Model):
         db_table: str = "category"
         verbose_name: str = "Категория"
         verbose_name_plural = "Категории"
+        ordering = ("id",)
 
     def __str__(self):
         return self.name
