@@ -7,8 +7,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, TemplateView
-
+from django.core.cache import cache
 from carts.models import Cart
+from common.mixins import CacheMixin
 from orders.models import Order, OrderItem
 from users.forms import UserLoginForm, UserRegistrationForm, ProfileForm
 
@@ -75,7 +76,7 @@ class UserRegistrationView(CreateView):
         return context
 
 
-class UserProfileView(LoginRequiredMixin, UpdateView):
+class UserProfileView(LoginRequiredMixin, CacheMixin, UpdateView):
     class UserProfileView(LoginRequiredMixin, UpdateView):
         template_name = 'users/profile.html'
         form_class = ProfileForm
@@ -95,12 +96,15 @@ class UserProfileView(LoginRequiredMixin, UpdateView):
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             context['title'] = 'Home - Кабинет'
-            context['orders'] = Order.objects.filter(user=self.request.user).prefetch_related(
+            orders = cache.get(f"orders_for_user_{self.request.user.id}")
+
+            orders = Order.objects.filter(user=self.request.user).prefetch_related(
                 Prefetch(
                     "orderitem_set",
                     queryset=OrderItem.objects.select_related("product"),
                 )
             ).order_by("-id")
+            context['orders'] = self.set_get_cache(orders, f"user_{self.request.user.id}_orders", 60)
             return context
 
 
